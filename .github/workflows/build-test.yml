@@ -1,0 +1,83 @@
+name: Osiso Backend CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+      - releases/*
+    paths-ignore:
+      - '**.md'
+
+env:
+  APP_ENV: test
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: node:10.18-jessie
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    strategy:
+      matrix:
+        node-version: [15.x]
+        os: [ubuntu-latest]
+        # mongodb-version: [4.0, 4.2, 4.4]
+
+    steps:
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.3.0
+        with:
+          # mongodb-version: ${{ matrix.mongodb-version }}
+          mongodb-version: 4.4
+          mongodb-replica-set: test-rs
+
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Run unit tests
+        run: yarn test
+
+      - name: Run end to end tests
+        run: yarn test:e2e
+        env: 
+          TEST_DB_TYPE: postgres
+          TEST_DB_HOST: postgres
+          TEST_DB_PORT: ${{ job.services.postgres.ports['5432'] }}
+          TEST_DB_USERNAME: postgres
+          TEST_DB_PASSWORD: postgres
+          TEST_DB_DATABASE: postgres
+
+      - name: Run code coverage
+        run: yarn test:cov

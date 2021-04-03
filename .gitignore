@@ -1,0 +1,13 @@
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+
+.env
+.env.*
+coverage/
+dist/
+data
+yarn-error.log
