@@ -4,11 +4,11 @@ import {
   Entity,
   BeforeInsert,
   ManyToOne,
-  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserType } from '../../user-type/entities/user-type.entity';
-import { Rider } from '../../riders/entities/rider.entity';
+import { Country } from '../../countries/entities/country.entity';
 
 @Entity('users')
 export class User {
@@ -18,11 +18,9 @@ export class User {
   @ManyToOne(() => UserType, (type) => type.users)
   userType: UserType;
 
-  @OneToOne(() => Rider, (rider) => rider.user, {
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  })
-  rider: Rider;
+  @JoinColumn({ name: 'countryId' })
+  @ManyToOne(() => Country, (country) => country.users)
+  country: Country;
 
   @Column('varchar')
   firstName: string;

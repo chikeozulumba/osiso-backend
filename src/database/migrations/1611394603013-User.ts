@@ -24,6 +24,11 @@ export class User1611394603013 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'countryId',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
             name: 'firstName',
             type: 'varchar',
             isNullable: false,

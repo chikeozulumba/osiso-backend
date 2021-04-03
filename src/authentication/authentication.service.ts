@@ -4,6 +4,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -26,6 +27,7 @@ import { AppConfigService } from '../config/app/config.service';
 import { PasswordResetInitiateDTO } from './dto/password-reset-initiate.dto';
 import { randomIntFromInterval } from '../common/utils/number';
 import { PasswordResetCompleteDTO } from './dto/password-reset-complete.dto';
+import { Country } from '../models/countries/entities/country.entity';
 
 /**
  *
@@ -40,6 +42,8 @@ export class AuthenticationService {
     private readonly usersRepository: UsersRepository,
     @InjectRepository(UserType)
     private readonly userTypeRepository: Repository<UserType>,
+    @InjectRepository(Country)
+    private readonly countryRepository: Repository<Country>,
     private readonly phoneNumberService: PhoneNumberService,
     private readonly jwtService: JwtService,
     private readonly appConfigService: AppConfigService,
@@ -153,9 +157,23 @@ export class AuthenticationService {
    * @memberof AuthenticationService
    */
   async signUpUser(payload: SignUpDto): Promise<void> {
-    this.phoneNumberService
-      .parsePhoneNumber(payload.phoneNumber)
-      .validateNumber({ throwError: true });
+    const country = await this.countryRepository.findOne(payload.countryId);
+
+    if (!country) {
+      throw new ConflictException({
+        statusCode: 422,
+        fields: {
+          countryId: 'Country selection is not valid',
+        },
+        type: 'validation',
+      });
+    }
+
+    const phoneNumber = this.phoneNumberService.parsePhoneNumber(
+      payload.phoneNumber,
+      country.alphaTwo,
+    );
+    phoneNumber.validateNumber({ throwError: true });
 
     const checkUserExist = await this.usersRepository.findOne({
       where: [{ phoneNumber: payload.phoneNumber }, { email: payload.email }],
@@ -169,7 +187,7 @@ export class AuthenticationService {
             ? 'Email'
             : checkUserExist.phoneNumber === payload.phoneNumber
             ? 'Phone number'
-            : '') + ' field already in use.'
+            : '') + ' already in use.'
         }`,
       });
     }
@@ -196,15 +214,15 @@ export class AuthenticationService {
         {
           ...payload,
           userType,
+          country,
         },
       );
       await this.usersRepository.save(user);
     } catch (error) {
-      throw new UnprocessableEntityException({
-        statusCode: 422,
-        message: {
-          scope: 'Invalid account scope.',
-        },
+      console.log(error);
+      throw new InternalServerErrorException({
+        statusCode: 500,
+        message: 'Error while creating account.',
       });
     }
   }

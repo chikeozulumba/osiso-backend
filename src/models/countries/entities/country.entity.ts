@@ -1,5 +1,6 @@
 import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
 import { State } from '../../states/entities/state.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('countries')
 export class Country {
@@ -44,6 +45,9 @@ export class Country {
 
   @OneToMany(() => State, (state) => state.country)
   states: State[];
+
+  @OneToMany(() => User, (user) => user.country)
+  users: User[];
 
   @Column('int2')
   active: number;

@@ -1,4 +1,4 @@
-import { IsString, IsEmail } from 'class-validator';
+import { IsString, IsEmail, IsUUID } from 'class-validator';
 
 export class SignUpDto {
   @IsString()
@@ -19,6 +19,9 @@ export class SignUpDto {
 
   @IsString()
   readonly password: string;
+
+  @IsUUID('4')
+  readonly countryId: string;
 
   // @IsString()
   // readonly nin: string;

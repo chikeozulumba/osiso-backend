@@ -13,6 +13,7 @@ import { CacheProviderModule } from '../providers/cache/cache.module';
 import { UsersRepository } from '../models/users/users.repository';
 import { User } from '../models/users/entities/user.entity';
 import { ModelsRepository } from '../models/models.repository';
+import { Country } from '../models/countries/entities/country.entity';
 
 /**
  *
@@ -25,7 +26,7 @@ import { ModelsRepository } from '../models/models.repository';
     PassportModule,
     UsersModule,
     PhoneNumberProviderModule,
-    TypeOrmModule.forFeature([User, UserType, UsersRepository]),
+    TypeOrmModule.forFeature([User, UserType, UsersRepository, Country]),
     JwtProviderModule,
     AppConfigModule,
     CacheProviderModule,

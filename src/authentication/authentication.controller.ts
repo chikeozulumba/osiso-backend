@@ -1,5 +1,4 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
-import { LocalAuthGuard } from '../common/guards/authentication/local.guard';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { JoiValidationPipe } from '../common/pipes/joi-validation.pipe';
 import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './dto/login.dto';

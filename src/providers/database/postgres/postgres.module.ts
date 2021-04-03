@@ -5,7 +5,6 @@ import { PostgresDatabaseConfigModule } from '../../../config/database/postgres/
 import { PostgresConfigService } from '../../../config/database/postgres/config.service';
 import { User } from '../../../models/users/entities/user.entity';
 import { UserType } from '../../../models/user-type/entities/user-type.entity';
-import { Rider } from '../../../models/riders/entities/rider.entity';
 import { Country } from '../../../models/countries/entities/country.entity';
 import { State } from '../../../models/states/entities/state.entity';
 
@@ -20,7 +19,7 @@ import { State } from '../../../models/states/entities/state.entity';
         username: postgresConfigService.username,
         password: postgresConfigService.password,
         database: postgresConfigService.database,
-        entities: [User, UserType, Rider, Country, State],
+        entities: [User, UserType, Country, State],
       }),
       inject: [PostgresConfigService],
     } as TypeOrmModuleAsyncOptions),

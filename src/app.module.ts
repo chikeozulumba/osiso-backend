@@ -6,6 +6,7 @@ import { RootProviderModule } from './providers/provider.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { ModelsModule } from './models/models.module';
 import { JwtAuthGuard } from './common/guards/authentication/jwt-auth.guard';
+import { MeetingsModule } from './meetings/meetings.module';
 
 /**
  * @description App module
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from './common/guards/authentication/jwt-auth.guard';
     RootProviderModule,
     ModelsModule,
     AuthenticationModule,
+    MeetingsModule,
   ],
   providers: [
     AppService,
